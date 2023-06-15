@@ -13,34 +13,46 @@ const Home = () => {
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
   ]);
+  const directions = [
+    [1, -1],
+    [-1, -1],
+    [-1, 1],
+    [1, 1],
+    [1, 0],
+    [0, 1],
+    [0, -1],
+    [-1, 0],
+  ];
+
   const onClick = (x: number, y: number) => {
     console.log(x, y);
     const newBoard: number[][] = JSON.parse(JSON.stringify(board));
-    if (
-      board[y + 1] !== undefined &&
-      board[y + 1][x] === 3 - turnColor &&
-      board[y + 2][x] === turnColor
-    ) {
-      newBoard[y][x] = turnColor;
-      newBoard[y + 1][x] = turnColor;
-      setTurnColor(3 - turnColor);
-    }
-    if (
-      board[y - 1] !== undefined &&
-      board[y - 1][x] === 3 - turnColor &&
-      board[y - 2][x] === turnColor
-    ) {
-      newBoard[y][x] = turnColor;
-      newBoard[y - 1][x] = turnColor;
-      setTurnColor(3 - turnColor);
-    }
-    if (board[y][x - 1] === 3 - turnColor && board[y][x - 2] === turnColor) {
-      newBoard[y][x] = turnColor;
-      newBoard[y][x - 1] = turnColor;
-      setTurnColor(3 - turnColor);
-    }
+    for (const direction of directions) {
+      let isPassOnAnother = false;
+      for (let i = 1; i < 8; i++) {
+        if (board[y][x] === 0) {
+          if (board[y + i * direction[0]] === undefined) {
+            break;
+          } else if (
+            board[y + i * direction[0]][x + i * direction[1]] === turnColor &&
+            isPassOnAnother
+          ) {
+            for (let s = 0; s <= i; s++) {
+              newBoard[y + (i - s) * direction[0]][x + (i - s) * direction[1]] = turnColor;
+            }
 
-    setBoard(newBoard);
+            setTurnColor(3 - turnColor);
+            setBoard(newBoard);
+            break;
+          } else if (board[y + i * direction[0]][x + i * direction[1]] === 3 - turnColor) {
+            isPassOnAnother = true;
+            continue;
+          } else {
+            break;
+          }
+        }
+      }
+    }
   };
 
   return (
